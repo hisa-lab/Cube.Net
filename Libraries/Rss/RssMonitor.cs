@@ -464,7 +464,7 @@ namespace Cube.Net.Rss
             var errors = new Dictionary<Uri, Exception>();
             await RunAsync(src, errors).ConfigureAwait(false);
 
-            /* ここを変更する
+            
             for (var i = 0; i < RetryCount && errors.Count > 0; ++i)
             {
                 await Task.Delay(RetryInterval).ConfigureAwait(false);
@@ -474,7 +474,7 @@ namespace Cube.Net.Rss
             }
 
             await PublishErrorAsync(errors).ConfigureAwait(false);
-            */
+            
         }
 
         #endregion
