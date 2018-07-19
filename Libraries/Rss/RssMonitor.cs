@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Cube.Net.Rss
 {
@@ -465,8 +466,12 @@ namespace Cube.Net.Rss
             await RunAsync(src, errors).ConfigureAwait(false);
 
             
+            Timer timer = new Timer(60000);// タイマーの間隔(ミリ秒)60sec
+
+
             for (var i = 0; i < RetryCount && errors.Count > 0; ++i)
             {
+                timer.Stop();
                 await Task.Delay(RetryInterval).ConfigureAwait(false);
                 var retry = errors.Keys.ToList();
                 errors.Clear();
