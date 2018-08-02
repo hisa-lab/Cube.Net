@@ -444,6 +444,9 @@ namespace Cube.Net.Rss
                 try
                 {
                     if (State != TimerState.Run) return;
+                    await Task.Delay(60 * 1000);// 追加した7月19日
+                    this.LogInfo("test");// 追加した7月19日
+                    this.LogInfo("new data");//
                     await UpdateAsync(uri).ConfigureAwait(false);
                 }
                 catch (Exception err) { errors.Add(uri, err); }
@@ -465,13 +468,13 @@ namespace Cube.Net.Rss
             var errors = new Dictionary<Uri, Exception>();
             await RunAsync(src, errors).ConfigureAwait(false);
 
-            
-            Timer timer = new Timer(60000);// タイマーの間隔(ミリ秒)60sec
+           
 
-
+            //RetryCount 通信失敗時に再試行する最大回数を取得または設定します
+            //
             for (var i = 0; i < RetryCount && errors.Count > 0; ++i)
             {
-                timer.Stop();
+             
                 await Task.Delay(RetryInterval).ConfigureAwait(false);
                 var retry = errors.Keys.ToList();
                 errors.Clear();
