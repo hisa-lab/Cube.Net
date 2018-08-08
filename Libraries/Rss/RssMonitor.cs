@@ -444,9 +444,8 @@ namespace Cube.Net.Rss
                 try
                 {
                     if (State != TimerState.Run) return;
-                    await Task.Delay(60 * 1000);// 追加した7月19日
-                    this.LogInfo("test");// 追加した7月19日
-                    this.LogInfo("new data");//
+                    await Task.Delay(60 * 1000);
+                    this.LogInfo("test");
                     await UpdateAsync(uri).ConfigureAwait(false);
                 }
                 catch (Exception err) { errors.Add(uri, err); }
