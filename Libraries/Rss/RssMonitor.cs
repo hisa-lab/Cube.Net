@@ -407,6 +407,10 @@ namespace Cube.Net.Rss
 
             var sw   = Stopwatch.StartNew();
             var dest = await GetAsync(uri).ConfigureAwait(false);
+            var log = new Dictionary<Uri, RssFeed>();
+            log.Add(uri, dest);
+            this.LogInfo("log");
+            //
             this.LogDebug($"{uri} ({sw.Elapsed})");
 
             Feeds[uri] = dest.LastChecked;
