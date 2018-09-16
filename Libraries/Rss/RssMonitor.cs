@@ -146,7 +146,7 @@ namespace Cube.Net.Rss
         ///
         /* ----------------------------------------------------------------- */
         public DateTime? LastChecked(Uri uri) => Feeds[uri];
-
+        
         /* ----------------------------------------------------------------- */
         ///
         /// Register
@@ -407,14 +407,13 @@ namespace Cube.Net.Rss
 
             var sw   = Stopwatch.StartNew();
             var dest = await GetAsync(uri).ConfigureAwait(false);
-            var log = new Dictionary<Uri, RssFeed>();
-            log.Add(uri, dest);
+            var oldlog = new Dictionary<Uri, RssFeed>();
             this.LogInfo(uri.ToString());
-            this.LogInfo(dest.ToString());
-
+            this.LogInfo("最新 " + datenew.LastPublished.ToString());
             this.LogDebug($"{uri} ({sw.Elapsed})");
 
             Feeds[uri] = dest.LastChecked;
+            
             await PublishAsync(dest).ConfigureAwait(false);
         }
 
@@ -493,6 +492,7 @@ namespace Cube.Net.Rss
 
         #region Fields
         private readonly RssClient _http;
+        private readonly RssFeed datenew;
         #endregion
     }
 }
