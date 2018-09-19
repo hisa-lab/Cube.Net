@@ -407,15 +407,14 @@ namespace Cube.Net.Rss
 
             var sw   = Stopwatch.StartNew();
             var dest = await GetAsync(uri).ConfigureAwait(false);
-            var oldlog = new Dictionary<Uri, RssFeed>();
             this.LogInfo("URL " + uri.ToString()); 
             this.LogDebug($"{uri} ({sw.Elapsed})");
-
-            Feeds[uri] = dest.LastChecked;
-
             Feeds[uri] = dest.LastPublished;
-            this.LogInfo("Latest update " + Feeds[uri].ToString());
             
+            this.LogInfo("Latest update " + Feeds[uri].ToString());
+
+           
+            Feeds[uri] = dest.LastChecked;
 
             await PublishAsync(dest).ConfigureAwait(false);
         }
@@ -451,9 +450,10 @@ namespace Cube.Net.Rss
                 try
                 {
                     if (State != TimerState.Run) return;
-                    await Task.Delay(60 * 1000);
+                    await Task.Delay(10 * 1000);
                     this.LogInfo("test"); 
                     await UpdateAsync(uri).ConfigureAwait(false);
+                    this.LogInfo("比較 " + _savedata);
                 }
                 catch (Exception err) { errors.Add(uri, err); }
             }
@@ -497,6 +497,8 @@ namespace Cube.Net.Rss
 
         #region Fields
         private readonly RssClient _http;
+        private IList<RssItem> _savedata;
+        private Dictionary<Uri, RssFeed> _savedata2;
         #endregion
     }
 }
