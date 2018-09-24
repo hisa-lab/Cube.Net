@@ -24,6 +24,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using System.IO;
+using System.Text;
 
 namespace Cube.Net.Rss
 {
@@ -419,18 +421,22 @@ namespace Cube.Net.Rss
             _savedata = dest;
 
             Feeds[uri] = dest.LastPublished;
-            this.LogInfo("Latest update " + Feeds[uri].ToString());
+            this.LogInfo("最新記事の更新日時 " + Feeds[uri].ToString());
 
             var count = 0;
             var salmons = dest.Items;
             foreach (var data in salmons)
             {
                 count++;
-                this.LogInfo("Latest article issue date " + data.PublishTime);
+                this.LogInfo("記事の発行日時 " + data.PublishTime);
             }
             this.LogInfo(count.ToString());
 
-            Feeds[uri] = dest.LastChecked;
+
+
+        StreamReader a = new StreamReader(" ");
+
+        Feeds[uri] = dest.LastChecked;
             await PublishAsync(dest).ConfigureAwait(false);
         }
 
@@ -472,7 +478,7 @@ namespace Cube.Net.Rss
                     var salmons = _savedata.Items;
                     foreach (var data in salmons)
                     {
-                        this.LogInfo("Latest article issue savedate " + data.PublishTime);
+                        this.LogInfo("新着記事一覧 " + data.PublishTime);
                     }
                 }
                 catch (Exception err) { errors.Add(uri, err); }
