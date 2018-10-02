@@ -419,10 +419,8 @@ namespace Cube.Net.Rss
 
             _savedata = dest;
 
+          
             
-            
-
-            //これを差分に使え
             Feeds[uri] = dest.LastPublished;
             this.LogInfo("最新記事の更新日時" + "," + Feeds[uri].ToString());
             _savedata3 = Feeds[uri];
@@ -439,7 +437,6 @@ namespace Cube.Net.Rss
 
             
             Feeds[uri] = dest.LastChecked;
-            _savedata4 = Feeds[uri];
             await PublishAsync(dest).ConfigureAwait(false);
         }
 
@@ -478,15 +475,16 @@ namespace Cube.Net.Rss
                     this.LogInfo("test"); 
                     await UpdateAsync(uri).ConfigureAwait(false);
 
+                    _savedata4 = Feeds[uri];
 
-                    
-                    if(_savedata3 == _savedata3)
+
+                    if (_savedata3 == _savedata4)
                     {
-                        this.LogInfo("差分 " + uri + "," + "data.PublishTime" + "," + "0");
+                        this.LogInfo("差分" + "," + uri + "," + _savedata3 + "," + "0");
                     }
                     else
                     {
-                        this.LogInfo("差分 " + uri + "," + "data.PublishTime" + "," + "1");
+                        this.LogInfo("差分" + "," + uri + "," + _savedata3 + "," + "1");
                     }
                     
 
