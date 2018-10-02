@@ -24,8 +24,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using System.IO;
-using System.Text;
+
 
 namespace Cube.Net.Rss
 {
@@ -409,34 +408,38 @@ namespace Cube.Net.Rss
 
             var sw   = Stopwatch.StartNew();
             var dest = await GetAsync(uri).ConfigureAwait(false);
-            this.LogInfo("URL " + uri.ToString()); 
-            this.LogDebug($"{uri} ({sw.Elapsed})");
+            this.LogInfo("URL"+ "," + uri.ToString()); 
+            this.LogDebug($"{uri} , ({sw.Elapsed})");
 
-            Dictionary<Uri, RssFeed> hoge = new Dictionary<Uri, RssFeed>()
+            Dictionary<Uri, RssFeed> savedate2 = new Dictionary<Uri, RssFeed>()
             {
                 { uri,dest}
             };
-            _savedata2 = hoge;
+            _savedata2 = savedate2;
 
             _savedata = dest;
 
+            
+            
+
+            //これを差分に使え
             Feeds[uri] = dest.LastPublished;
-            this.LogInfo("最新記事の更新日時 " + Feeds[uri].ToString());
+            this.LogInfo("最新記事の更新日時" + "," + Feeds[uri].ToString());
+            _savedata3 = Feeds[uri];
 
             var count = 0;
             var salmons = dest.Items;
             foreach (var data in salmons)
             {
                 count++;
-                this.LogInfo("記事の発行日時 " + data.PublishTime);
+                //this.LogInfo("記事の発行日時 " + "," + data.PublishTime);
             }
-            this.LogInfo(count.ToString());
+            this.LogInfo("データの数"+ "," + count.ToString());
 
 
-
-        StreamReader a = new StreamReader(" ");
-
-        Feeds[uri] = dest.LastChecked;
+            
+            Feeds[uri] = dest.LastChecked;
+            _savedata4 = Feeds[uri];
             await PublishAsync(dest).ConfigureAwait(false);
         }
 
@@ -475,11 +478,18 @@ namespace Cube.Net.Rss
                     this.LogInfo("test"); 
                     await UpdateAsync(uri).ConfigureAwait(false);
 
-                    var salmons = _savedata.Items;
-                    foreach (var data in salmons)
+
+                    
+                    if(_savedata3 == _savedata3)
                     {
-                        this.LogInfo("新着記事一覧 " + data.PublishTime);
+                        this.LogInfo("差分 " + uri + "," + "data.PublishTime" + "," + "0");
                     }
+                    else
+                    {
+                        this.LogInfo("差分 " + uri + "," + "data.PublishTime" + "," + "1");
+                    }
+                    
+
                 }
                 catch (Exception err) { errors.Add(uri, err); }
             }
@@ -525,6 +535,8 @@ namespace Cube.Net.Rss
         private readonly RssClient _http;
         private RssFeed _savedata;
         private Dictionary<Uri, RssFeed> _savedata2;
+        private DateTime? _savedata3;
+        private DateTime? _savedata4;
         #endregion
     }
 }

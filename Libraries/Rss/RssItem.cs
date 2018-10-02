@@ -113,7 +113,6 @@ namespace Cube.Net.Rss
             get => _publishTime;
             set => SetProperty(ref _publishTime, value);
         }
-
         /* ----------------------------------------------------------------- */
         ///
         /// Status
@@ -127,6 +126,7 @@ namespace Cube.Net.Rss
         {
             get => _status;
             set => SetProperty(ref _status, value);
+
         }
 
         /* ----------------------------------------------------------------- */
