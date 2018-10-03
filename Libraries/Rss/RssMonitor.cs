@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 /* ------------------------------------------------------------------------- */
+using Cube.Generics;
 using Cube.Log;
 using Cube.Net.Http;
 using Cube.Tasks;
@@ -23,8 +24,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
-
 
 namespace Cube.Net.Rss
 {
@@ -147,7 +146,7 @@ namespace Cube.Net.Rss
         ///
         /* ----------------------------------------------------------------- */
         public DateTime? LastChecked(Uri uri) => Feeds[uri];
-        
+
         /* ----------------------------------------------------------------- */
         ///
         /// Register
@@ -408,37 +407,29 @@ namespace Cube.Net.Rss
 
             var sw   = Stopwatch.StartNew();
             var dest = await GetAsync(uri).ConfigureAwait(false);
-            //this.LogInfo("URL"+ "," + uri.ToString()); 
-            this.LogDebug($"{uri} , ({sw.Elapsed})");
+            this.LogDebug($"{uri} ({sw.Elapsed})");
 
-            Dictionary<Uri, RssFeed> savedate2 = new Dictionary<Uri, RssFeed>()
+            var now = dest.LastChecked ?? DateTime.Now;
+            var pub = dest.LastPublished ?? DateTime.MinValue;
+
+            if (_data.ContainsKey(uri))
             {
-                { uri,dest}
-            };
-            _savedata2 = savedate2;
+                var cmp = _data[uri].LastPublished ?? DateTime.MinValue;
+                var changed = (pub > cmp) ? "1" : "0";
 
-            _savedata = dest;
+                this.LogError(string.Join(",", new[]
+                {
+                    now.ToString("yyyy/MM/dd HH:mm:ss").Quote(),
+                    pub.ToString("yyyy/MM/dd HH:mm:ss").Quote(),
+                    changed.Quote(),
+                    uri.ToString().Quote()
+                }));
 
-          
-            
-            Feeds[uri] = dest.LastPublished;
-            //this.LogInfo("最新記事の更新日時" + "," + Feeds[uri].ToString());
-            _savedata3 = Feeds[uri];
-
-
-            var count = 0;
-            var salmons = dest.Items;
-            foreach (var data in salmons)
-            {
-                count++;
-                //this.LogInfo("記事の発行日時 " + "," + data.PublishTime);
+                _data[uri] = dest;
             }
-            //this.LogInfo("データの数"+ "," + count.ToString());
+            else _data.Add(uri, dest);
 
-
-            
             Feeds[uri] = dest.LastChecked;
-            _savedata4 = Feeds[uri];
             await PublishAsync(dest).ConfigureAwait(false);
         }
 
@@ -473,22 +464,7 @@ namespace Cube.Net.Rss
                 try
                 {
                     if (State != TimerState.Run) return;
-                    await Task.Delay(10 * 1000);
-                    //this.LogInfo("test"); 
                     await UpdateAsync(uri).ConfigureAwait(false);
-
-                   
-                    _savedata5 = Feeds[uri];
-
-                    if (_savedata3 > _savedata5)
-                    {
-                        this.LogInfo(uri + "," + _savedata4 + "," + _savedata3 + "," + "0");
-                    }
-                    else
-                    {
-                        this.LogInfo(uri + "," + _savedata4 + "," + _savedata3 + "," + "1");
-                    }
-                    
                 }
                 catch (Exception err) { errors.Add(uri, err); }
             }
@@ -509,13 +485,8 @@ namespace Cube.Net.Rss
             var errors = new Dictionary<Uri, Exception>();
             await RunAsync(src, errors).ConfigureAwait(false);
 
-           
-
-            //RetryCount 通信失敗時に再試行する最大回数を取得または設定します
-            //
             for (var i = 0; i < RetryCount && errors.Count > 0; ++i)
             {
-             
                 await Task.Delay(RetryInterval).ConfigureAwait(false);
                 var retry = errors.Keys.ToList();
                 errors.Clear();
@@ -523,20 +494,13 @@ namespace Cube.Net.Rss
             }
 
             await PublishErrorAsync(errors).ConfigureAwait(false);
-            
         }
 
         #endregion
-        
-
 
         #region Fields
         private readonly RssClient _http;
-        private RssFeed _savedata;
-        private Dictionary<Uri, RssFeed> _savedata2;
-        private DateTime? _savedata3;
-        private DateTime? _savedata4;
-        private DateTime? _savedata5;
+        private readonly IDictionary<Uri, RssFeed> _data = new Dictionary<Uri, RssFeed>();
         #endregion
     }
 }
