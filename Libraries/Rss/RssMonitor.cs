@@ -480,7 +480,7 @@ namespace Cube.Net.Rss
                    
                     _savedata5 = Feeds[uri];
 
-                    if (_savedata3 == _savedata5)
+                    if (_savedata3 > _savedata5)
                     {
                         this.LogInfo(uri + "," + _savedata4 + "," + _savedata3 + "," + "0");
                     }
