@@ -75,8 +75,8 @@ namespace Cube.Net.Rss.App.Reader
                 IsReadOnly     = Settings.Lock.IsReadOnly,
                 UserAgent      = Settings.UserAgent
             };
-            _core.Set(RssCheckFrequency.High,TimeSpan.FromSeconds(1));
-            _core.Set(RssCheckFrequency.Low,TimeSpan.FromSeconds(1));
+            _core.Set(RssCheckFrequency.High, Settings.Shared.HighInterval);
+            _core.Set(RssCheckFrequency.Low, Settings.Shared.LowInterval);
             _core.Received += WhenReceived;
 
             _checker = new UpdateChecker(Settings);
