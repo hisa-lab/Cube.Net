@@ -466,7 +466,11 @@ namespace Cube.Net.Rss
                     if (State != TimerState.Run) return;
                     await UpdateAsync(uri).ConfigureAwait(false);
                 }
-                catch (Exception err) { errors.Add(uri, err); }
+                catch (Exception err)
+                {
+                    this.LogDebug($"{uri}:{err}", err);
+                    errors.Add(uri, err);
+                }
             }
         }
 
@@ -481,6 +485,8 @@ namespace Cube.Net.Rss
         /* ----------------------------------------------------------------- */
         private async Task WhenTick()
         {
+            this.LogDebug($"Tick ({GetHashCode()})");
+
             var src    = Feeds.OrderBy(e => e.Value).Select(e => e.Key).ToList();
             var errors = new Dictionary<Uri, Exception>();
             await RunAsync(src, errors).ConfigureAwait(false);
