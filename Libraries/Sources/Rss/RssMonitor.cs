@@ -412,9 +412,9 @@ namespace Cube.Net.Rss
             var now = dest.LastChecked ?? DateTime.Now;
             var pub = dest.LastPublished ?? DateTime.MinValue;
 
-            if (_data.ContainsKey(uri))
+            if (_data.TryGetValue(uri, out var feed))
             {
-                var cmp = _data[uri].LastPublished ?? DateTime.MinValue;
+                var cmp = GetLastPublish(pub, feed) ?? DateTime.MinValue;
                 var changed = (pub > cmp) ? "1" : "0";
 
                 this.LogError(string.Join(",", new[]
@@ -432,6 +432,28 @@ namespace Cube.Net.Rss
             Feeds[uri] = dest.LastChecked;
             await PublishAsync(dest).ConfigureAwait(false);
         }
+
+        /* ----------------------------------------------------------------- */
+        ///
+        ///  GetLastPublish
+        ///
+        /// <summary>
+        /// 最新の更新日時を取得します。
+        /// </summary>
+        ///
+        /// <remarks>
+        /// src に指定した日時以降の RssItem が複数存在する場合、それらの
+        /// 中で最も古い日時を返します。
+        /// </remarks>
+        ///
+        /* ----------------------------------------------------------------- */
+        private DateTime? GetLastPublish(DateTime src, RssFeed feed) =>
+            feed.Items
+                .Where(e => e.PublishTime.HasValue)
+                .OrderByDescending(e => e.PublishTime.Value)
+                .Select(e => e.PublishTime)
+                .LastOrDefault(e => e.Value > src)
+            ?? feed.LastPublished;
 
         /* ----------------------------------------------------------------- */
         ///
